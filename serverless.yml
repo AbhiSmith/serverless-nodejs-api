@@ -11,7 +11,7 @@ provider:
     # DATABASE_URL: ${env:DATABASE_URL, "fallback value"}
   iam:
     role:
-      name: serverless-my-ssm-role
+      name: serverless-my-ssm-role-${env:STAGE, "prod"}
       statements:
         - Effect: Allow
           Action:
