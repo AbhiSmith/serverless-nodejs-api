@@ -1,0 +1,52 @@
+service: serverless-nodejs-api
+frameworkVersion: '3'
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  environment:    
+    DEBUG: ${env:DEBUG, 0}
+    STAGE: ${env:STAGE, "prod"}
+    # DATABASE_URL: ${env:DATABASE_URL, "fallback value"}
+  iam:
+    role:
+      name: serverless-my-ssm-role
+      statements:
+        - Effect: Allow
+          Action:
+            - "ssm:GetParameter"
+            - "ssm:GetParameters"
+            - "ssm:GetParametersByPath"
+            - "ssm:GetParameterHistory"
+            - "ssm:DescribeParameters"
+          Resource: '*'
+            # - arn:aws:ssm:us-east-1:*:parameter/dev/db_host
+            # - arn:aws:ssm:us-east-1:*:parameter/dev/db_user
+            # - arn:aws:ssm:us-east-1:*:parameter/dev/db_password
+            # - arn:aws:ssm:us-east-1:*:parameter/dev/db_name
+            # - arn:aws:ssm:us-east-1:*:parameter/dev/db_port
+            # - arn:aws:ssm:us-east-1:*:parameter/dev/db_sslmode
+            # - arn:aws:ssm:us-east-1:*:parameter/dev/db_timezone
+            # - arn:aws:ssm:us-east-1:*:parameter/dev/db_max_idle_conns
+
+functions:
+  api:
+    handler: src/index.handler
+    events:
+      - httpApi: '*'
+
+custom:
+  dotenv:
+    exclude:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
+      - DATABASE_URL
+  # deploymentBucket:
+  #   name: serverless-nodejs-api-bucket
+
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
